@@ -1,0 +1,52 @@
+pragma solidity ^0.8.0;
+contract AssemblyExample {
+    uint256 public storedData;
+    function manipulateData(uint256 value1, uint256 value2) public {
+        // MSTORE: Store value1 at memory location 0x00
+        assembly {
+            mstore(0x00, value1)
+        }
+        // MLOAD: Load value1 from memory location 0x00
+        assembly {
+            storedData := mload(0x00)
+        }
+        // PUSH [1 - 32]: Push 1 onto the stack
+        assembly {
+            // Push 1 onto the stack
+            push 1
+        }
+        // ADD: Add value1 to value2
+        assembly {
+            // Load value1 from memory
+            mload(0x00)
+            // Load value2 from memory
+            mload(0x20)
+            // Add the two values
+            add
+            // Store the result back to value1 in memory
+            mstore(0x00, add)
+        }
+        // LT: Compare value1 and value2
+        bool isLessThan;
+        assembly {
+            // Load value1 from memory
+            mload(0x00)
+            // Load value2 from memory
+            mload(0x20)
+            // Compare value1 < value2
+            lt
+            // Store the result back to isLessThan in memory
+            isLessThan := mload(0x00)
+        }
+        // SSTORE: Store comparison result in storage
+        assembly {
+            // Store isLessThan in storage slot 0
+            sstore(0x00, isLessThan)
+        }
+        // SLOAD: Load comparison result from storage
+        assembly {
+            // Load isLessThan from storage slot 0
+            isLessThan := sload(0x00)
+        }
+    }
+}
