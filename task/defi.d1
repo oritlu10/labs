@@ -1,0 +1,5 @@
+shape: sequence_diagram
+alice -> Lido Finance: send ETH
+Lido Finance -> Ethereum network
+Ethereum network -> alice:Lido's staked ETH token
+alice -> everybody :transfer, trade, or lend stETH without affecting her staked ETH
