@@ -1,0 +1,6 @@
+shape: sequence_diagram
+bob -> Aave: deposits DAI (stablecoin) on Aave
+Aave -> Charles :borrows USDC (another stablecoin) from Aave, offering DAI as collateral
+Charles-> Aave :offering DAI as collateral
+Aave -> Bob : interest on his deposited DAI.
+Charles -> Aave : pays interest on his borrowed USDC.
