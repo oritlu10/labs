@@ -67,10 +67,10 @@ contract collectorsFuzzTest is Test {
         address ownerAddress = 0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496; // address of owner user
         vm.startPrank(ownerAddress); // send from owner address
         console.log(address(msg.sender));
-        if(walletGabaim.collectors(oldGabai)!=1){
+        if(walletGabaim.gabaim(oldGabai)!=1){
             vm.expectRevert();
         }
-        walletGabaim.updateCollectors(oldGabai, newGabai);
+        walletGabaim.updateGabaim(oldGabai, newGabai);
         vm.stopPrank();
     }
 }
