@@ -8,11 +8,11 @@ import "forge-std/console.sol";
 import "../../src/wallet/wallet.sol";
 
 contract GabaimFuzzTest is Test {
-    GabaimWallet public walletGabaim;
+    wallet public walletGabaim;
     address userAddress = vm.addr(1);
 
     function setUp() public {
-        walletGabaim = new GabaimWallet();
+        walletGabaim = new wallet();
         // why it is not work?
         // payable(address(walletGabaim)).transfer(1000); // move 1000 to the contract
     }
