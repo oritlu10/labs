@@ -63,7 +63,7 @@ contract collectorsFuzzTest is Test {
         vm.stopPrank();
     }
 
-    function testUpdateCollectors(address oldGabai, address newGabai) public {
+    function testUpdateGabaim(address oldGabai, address newGabai) public {
         address ownerAddress = 0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496; // address of owner user
         vm.startPrank(ownerAddress); // send from owner address
         console.log(address(msg.sender));
