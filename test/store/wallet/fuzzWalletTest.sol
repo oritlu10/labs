@@ -5,7 +5,7 @@ import "foundry-huff/HuffDeployer.sol";
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "../../src/wallet/CollectorsWallet.sol";
+import "../../src/wallet/wallet.sol";
 
 contract GabaimFuzzTest is Test {
     GabaimWallet public walletGabaim;
