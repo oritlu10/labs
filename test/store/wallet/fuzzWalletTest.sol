@@ -7,12 +7,12 @@ import "forge-std/console.sol";
 
 import "../../src/wallet/CollectorsWallet.sol";
 
-contract collectorsFuzzTest is Test {
-    CollectorsWallet public walletGabaim;
+contract GabaimFuzzTest is Test {
+    GabaimWallet public walletGabaim;
     address userAddress = vm.addr(1);
 
     function setUp() public {
-        walletGabaim = new CollectorsWallet();
+        walletGabaim = new GabaimWallet();
         // why it is not work?
         // payable(address(walletGabaim)).transfer(1000); // move 1000 to the contract
     }
