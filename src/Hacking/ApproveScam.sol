@@ -19,33 +19,33 @@ Users should only approve the amount of tokens necessary for the operation at ha
 
 contract ContractTest is Test {
     ERC20 ERC20Contract;
-    address alice = vm.addr(1);
-    address eve = vm.addr(2);
+    address orit = vm.addr(1);
+    address kobi = vm.addr(2);
 
     function testApproveScam() public {
         ERC20Contract = new ERC20();
         ERC20Contract.mint(1000);
-        ERC20Contract.transfer(address(alice), 1000);
+        ERC20Contract.transfer(address(orit), 1000);
 
-        vm.prank(alice);
+        vm.prank(orit);
         // Be Careful to grant unlimited amount to unknown website/address.
         // Do not perform approve, if you are sure it's from a legitimate website.
-        // Alice granted approval permission to Eve.
-        ERC20Contract.approve(address(eve), type(uint256).max);
+        // Orit granted approval permission to Kobi.
+        ERC20Contract.approve(address(kobi), type(uint256).max);
 
         console.log(
-            "Before exploiting, Balance of Eve:",
-            ERC20Contract.balanceOf(eve)
+            "Before exploiting, Balance of Kobi:",
+            ERC20Contract.balanceOf(kobi)
         );
         console.log(
-            "Due to Alice granted transfer permission to Eve, now Eve can move funds from Alice"
+            "Due to Orit granted transfer permission to Kobi, now Kobi can move funds from Orit"
         );
-        vm.prank(eve);
-        // Now, Eve can move funds from Alice.
-        ERC20Contract.transferFrom(address(alice), address(eve), 1000);
+        vm.prank(kobi);
+        // Now, Kobi can move funds from Orit.
+        ERC20Contract.transferFrom(address(orit), address(kobi), 1000);
         console.log(
-            "After exploiting, Balance of Eve:",
-            ERC20Contract.balanceOf(eve)
+            "After exploiting, Balance of Kobi:",
+            ERC20Contract.balanceOf(kobi)
         );
         console.log("Exploit completed");
     }
