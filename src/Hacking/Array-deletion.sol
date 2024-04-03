@@ -16,35 +16,31 @@ Mitigation:
 Option1: By copying the last element and placing it in the position to be removed.
 Option2: By shifting them from right to left.
 
-REF:
-https://twitter.com/1nf0s3cpt/status/1677167550277509120
-https://blog.solidityscan.com/improper-array-deletion-82672eed8e8d
-https://github.com/sherlock-audit/2023-03-teller-judging/issues/88
 */
 
 contract ContractTest is Test {
-    ArrayDeletionBug ArrayDeletionBugContract;
-    FixedArrayDeletion FixedArrayDeletionContract;
+    ArrayDeletionBug arrayDeletionBugContract;
+    FixedArrayDeletion fixedArrayDeletionContract;
 
     function setUp() public {
-        ArrayDeletionBugContract = new ArrayDeletionBug();
-        FixedArrayDeletionContract = new FixedArrayDeletion();
+        arrayDeletionBugContract = new ArrayDeletionBug();
+        fixedArrayDeletionContract = new FixedArrayDeletion();
     }
 
     function testArrayDeletion() public {
-        ArrayDeletionBugContract.myArray(1);
+        arrayDeletionBugContract.myArray(1);
         //delete incorrectly
-        ArrayDeletionBugContract.deleteElement(1);
-        ArrayDeletionBugContract.myArray(1);
-        ArrayDeletionBugContract.getLength();
+        arrayDeletionBugContract.deleteElement(1);
+        arrayDeletionBugContract.myArray(1);
+        arrayDeletionBugContract.getLength();
     }
 
     function testFixedArrayDeletion() public {
-        FixedArrayDeletionContract.myArray(1);
+        fixedArrayDeletionContract.myArray(1);
         //delete incorrectly
-        FixedArrayDeletionContract.deleteElement(1);
-        FixedArrayDeletionContract.myArray(1);
-        FixedArrayDeletionContract.getLength();
+        fixedArrayDeletionContract.deleteElement(1);
+        fixedArrayDeletionContract.myArray(1);
+        fixedArrayDeletionContract.getLength();
     }
 
     receive() external payable {}
