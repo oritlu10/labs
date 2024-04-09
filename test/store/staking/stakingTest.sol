@@ -18,11 +18,12 @@ contract StakingTest is Test{
         
         uint256 initialPoolBalance = staking.poolBalance();
         console.log(initialPoolBalance);
-        staking.deposit();
+        uint256 depositAmount = 100
+        staking.deposit(depositAmount);
         uint256 finalPoolBalance = staking.poolBalance();
         console.log(finalPoolBalance);
+        assertEq(finalPoolBalance, initialPololBalance + depositAmount);
         
-
     }
     function testWithdraw() public{
 
