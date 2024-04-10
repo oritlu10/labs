@@ -23,6 +23,8 @@ contract Staking {
         percent = 1000;
         owner = payable(msg.sender);
         rich = 0x7a3b914a1f0bD991BAf826F4fE9a47Bb9880d25f;
+        myToken = new MyToken();
+        myToken.mint(10**6);
     }
     modifier onlyOwner(){
         require(
