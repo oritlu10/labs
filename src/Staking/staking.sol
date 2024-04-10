@@ -36,13 +36,14 @@ contract Staking {
         for(uint256 i = 0; i < database[msg.sender].length; i++)
         {
             if(database[msg.sender][i].date == block.timestamp){
-                database[msg.sender][i].sum += msg.value;
+                database[msg.sender][i].sum += amount;
             }
             else{
-                database[msg.sender].push(User({ date: block.timestamp, sum: msg.value }));
+                database[msg.sender].push(User({ date: block.timestamp, sum: amount }));
             }
         }
-        poolBalance += msg.value;
+        myToken.transferFrom();
+        poolBalance += amount;
         _;
     }
     receive() external payable deposit{}
@@ -66,7 +67,9 @@ contract Staking {
                 sum += database[msg.sender][i].sum;
             }
         }
-        return amount < sum?amount:sum;
+        if(sum < amount)
+            return 0;
+        return amount;
     }
     function calculateSum(uint256 sum) public returns (uint256){
         uint256 rate = sum / poolBalance;
