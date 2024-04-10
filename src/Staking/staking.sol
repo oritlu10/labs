@@ -32,7 +32,7 @@ contract Staking {
             );
             _;
     }
-    modifier deposit(){
+    modifier deposit(uint256 amount) external payable{
         for(uint256 i = 0; i < database[msg.sender].length; i++)
         {
             if(database[msg.sender][i].date == block.timestamp){
