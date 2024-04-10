@@ -20,8 +20,7 @@ contract StakingTest is Test{
         
         uint256 initialPoolBalance = staking.poolBalance();
         console.log(initialPoolBalance);
-        uint256 depositAmount = 100
-        staking.deposit.value(depositAmount)();
+        staking.deposit(100);
         uint256 finalPoolBalance = staking.poolBalance();
         console.log(finalPoolBalance);
         assertEq(finalPoolBalance, initialPololBalance - depositAmount);
@@ -29,7 +28,7 @@ contract StakingTest is Test{
     }
     function testWithdraw() public{
         uint256 depositAmount = 100;
-        staking.deposit.value(depositAmount)();
+        staking.deposit(depositAmount)();
         uint256 initialPoolBalance = address(this).poolBalance();
         uint256 withdrawAmount = 50;
         staking.withdraw(withdrawAmount);
