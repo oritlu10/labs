@@ -8,6 +8,7 @@ import "../src/audit/approve.sol";
 contract StakingTest is Test {
 
 
+user1.address
 
 
 function withdraw( uint256 amount) external updateReward(msg.sender) {
