@@ -6,9 +6,42 @@ import "forge-std/console.sol";
 import "../src/Staking/Staking.sol";
 import "../src/audit/approve.sol";
 contract StakingTest is Test {
+ uint constant WAD = 10**18;
+StakingRewards staking;
+ERC20 rt;
+ERC20 st;
+
+address user1 = vm.addr(1);
+address user2 = vm.addr(2);
+address user3 = vm.addr(3);
+
+function setUp() public{
+rt = new ERC20('REWARD_TOKEN');
+st = new ERC20('STAKING_TOKEN');
+
+staking = new StakingRewards(address(st), address(rt);
+
+st.mint(user1, 1000 * WAD);
+st.mint(user2, 1000 * WAD);
+st.mint(user3, 1000 * WAD);
+}
 
 
-user1.address
+function StakeTest(){
+        vm.startPrank(user1); 
+        st.approve(address(staking));
+        staking.stake(100 * WAD)
+        vm.stopPrank();
+}
+
+
+function getRewardTest() {
+        uint256 r = rewards[msg.sender];
+        if (r > 0) {
+            rewards[msg.sender] = 0;
+            rewardsToken.transfer(msg.sender, r);
+        }
+    }
 
 
 function withdraw( uint256 amount) external updateReward(msg.sender) {
