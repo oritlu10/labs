@@ -5,8 +5,6 @@ import "forge-std/console.sol";
 import "/home/sarih/labs/task/cp.sol"
 import "../Wallet/Wallet.sol"
 contract split {
-
-
     constructor(){
      address[40] public addressArray;
     }
