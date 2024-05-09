@@ -5,12 +5,12 @@ import "forge-std/console.sol";
 import "/home/sarih/labs/task/cp.sol"
 
 contract testSplit in Test {
-
     testSplit ts;
 
     constructor(){
      ts = new testSplit;
     }
+
     function testSplitMoney() public {
          uint amount=80
          ts.splitMoney(amoumt);
