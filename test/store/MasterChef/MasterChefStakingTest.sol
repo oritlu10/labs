@@ -22,7 +22,7 @@ contract MasterChefStakingTest is Test{
         stakingToken.approve(address(this),200);
         stakingToken.mint(200);
         stakingToken.transferFrom(address(this), user1, 100);
-    }
+    }(0x14a34)
     function testWithdraw1() public{
         console.log(stakingToken.balanceOf(user1), " balance of user1");
         vm.startPrank(user1);
