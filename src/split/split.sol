@@ -6,19 +6,19 @@ import "/home/sarih/labs/task/cp.sol"
 import "../Wallet/Wallet.sol"
 contract split {
 
-    Wallet w;
 
     constructor(){
      address[40] public addressArray;
-     W = new Wallet;
-     uint amount = 60;
     }
-    function splitMoney(uint amount) public returns(address addressArray ){
-      uint amountSplit= amount/addressArray.length;
+    function splitMoney() public payable {
+      uint amountSplit= msg.value/addressArray.length;
       for (uint i = 0; i < addressArray.length; i++) {
-           w.transfer(addressArray[i].(msg.sender),amountSplit);
+           payable(addressArray[i].transfer(amountSplit);
       }
-      return addressArray;
+   
     }
+    function addAddress(address newAddress) public(){
+      addressArray.push(newAddress)
+    } 
 
 }
