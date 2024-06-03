@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
 contract TestSlot {
     bytes32 public constant slot = keccak256("TEST_SLOT");
 
