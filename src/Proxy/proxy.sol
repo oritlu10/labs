@@ -1,4 +1,7 @@
- contract Proxy {
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract Proxy {
         bytes32 private constant IMPLEMENTATION_SLOT =
         bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
     // 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103
