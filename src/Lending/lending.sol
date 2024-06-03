@@ -1,146 +1,143 @@
 pragma solidity ^0.8.24;
 
-// import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "forge-std/console.sol";
-// /home/user/Documents/yehudis/labs/lib/chainlink/contracts/src/v0.8/
-import "../../lib/chainlink/contracts/src/v0.8/l2ep/dev/arbitrum/ArbitrumSequencerUptimeFeed.sol";
-import "../../lib/chainlink/contracts/src/v0.8/interfaces/FeedRegistryInterface.sol";
-import "../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "../../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "../../lib/openzeppelin-contracts/contracts/utils/math/Math.sol";
-import "../math/Math.sol";
-import "../interfaces/ISwapRouter.sol";
+import "@openzeppelin/ERC20/IERC20.sol";
+import "@openzeppelin/ERC20/ERC20.sol"; 
+import "src/lending/math.sol";
 
-interface IUniswapRouter is ISwapRouter {
-    function refundETH() external payable;
-}
-contract lending is ERC20, Math1 {
-    using Math for uint256;
-    
+contract Lending, lendingMath {
+
+    uint public totalBorrowed;   // סך הלוואות
+    uint public totalReserve;    // 
+    uint public totalDeposit;    // סך ההפקדות
+    uint public totalCollateral; // סך הבטחונות
+    uint public maxLTV = 4;      // 1 = 20%
+    uint baseRate = 20000000000000000;
+    uint borrowRate = 300000000000000000;
+
+    address public owner;
+
+    mapping(address => uint) public usersCollateral;
+    mapping(address => uint) public usersBorrowed;
+
+    IERC20 public dai;
+    IERC20 public aDai;
+    IERC20 public aWeth;
+    IERC20 private weth;
+
+    uint constant ETHPrice = 2900;
+
     ArbitrumSequencerUptimeFeed internal priceFeed;
-    uint256 public maxLTV = 4;
-    uint256 public totalDeposit;
-    uint256 public totalBorrowed;
-    uint256 public totalCollateral;
-    uint256 public totalReserve;
-    uint256 constant ethPrice = 2900;
-    uint256 public baseRate = 20000000000000000;
-    uint256 public borrowRate = 300000000000000000;
-    IUniswapRouter public uniswapRouter ;
-    // mapping (address => uint256) usersDai;
-    mapping (address => uint256) private usersCollateral;
-    mapping (address => uint256) private usersBorrowed;
 
-    // address public owner;
-    IERC20 public dai ;
 
-    constructor(address tokenDai) ERC20("bond token" ,"bt"){
-        dai = IERC20(tokenDai);
-        priceFeed = ArbitrumSequencerUptimeFeed(tokenDai);
-        uniswapRouter =IUniswapRouter(tokenDai);
-        // owner = msg.sender;
-        
+
+    constructor(address daiToken) ERC20("bond", "BND") {
+        dai = IERC20(daiToken);
+        priceFeed =
+        ArbitrumSequencerUptimeFeed(0x9326BFA02ADD2366b30bacB125260Af641031331);
+
     }
+    receive() external payable {}
 
-    receive() external payable{}
-
-    
-    modifier onlyOwner(){
-       _; 
-    }
-    modifier onlyUser(){
+    modifier onlyOwner() {
+        require(msg.sender == owner, "not authorized");
         _;
     }
 
 
-    function bond(uint256 amount) external onlyUser{
-        require(amount > 0 );
-        require(dai.balanceOf(msg.sender) >= amount, "you do not have enough ballance");
-        dai.transferFrom(msg.sender , address(this), amount); 
+
+    function deposit(uint amount) external {
+        require(amount > 0, "Amount must be bigger than zero");
+        require(dai.balanceOf(msg.sender) >= amount, "You don't have enough dai");
+
+        dai.transferFrom(msg.sender, address(this), amount);
+                
         totalDeposit += amount;
-       
-        uint256 bondAmount = getExp(amount ,getExchangeRate() );
-        _mint(msg.sender, bondAmount);
-       
+
+
+        uint bondsToMint = getExp(amount, getExchangeRate());
+
+        _mint(msg.sender, bondsToMint);
     }
 
-    function unbond( uint256 amount) external onlyUser{
-        require ( amount>0);
-        require(balanceOf(msg.sender) >= amount, "you do not have enough tokens");
-        dai.transferFrom(address(this), msg.sender, amount);
-        uint256 daiToReceive = mulExp(amount ,getExchangeRate() );
-        _burn(msg.sender, daiToReceive);
-        totalDeposit -= amount;
+    function unbond(uint amount) external {
+        require(amount > 0, "Amount must be bigger than zero");
+        require(amount <= balanceOf(msg.sender), "You don't have enough bonds");
         
+        dai.transferFrom(address(this), msg.sender, amount);
+        
+        totalDeposit -= amount;
+
+        uint daiToRecieve = mulExp(amount, getExchangeRate());
+
+        _burn(msg.sender, daiToRecieve);
+
     }
-    function addCollateral() payable external onlyUser{
-        require( msg.value > 0 );
+
+    function addCollateral() payable external {
+        require(msg.value > 0, "Value must be bigger than zero");
         usersCollateral[msg.sender] += msg.value;
         totalCollateral += msg.value;
-        
     }
-    function removeCollateral( uint256 amount ) external onlyUser{
-        require( amount > 0 );
-        require ( usersCollateral[msg.sender] > 0,"you do not have any collaterals");
-        uint256 barrowed = usersBorrowed[msg.sender];
-        uint256 collateral = usersCollateral[msg.sender];
-        uint256 left = mulExp(collateral, ethPrice) - barrowed;
-        uint256 toRemove = mulExp(amount, ethPrice);
-        require ( toRemove < left , "you do not have enough" );
+
+    function removeCollateral(uint amount) external {
+        require(amount > 0);
+        require(usersCollateral[msg.sender] > 0, "You don't have any collaterals");
+
+        uint borrowed    = usersBorrowed[msg.sender];
+        uint collaterals = usersCollateral[msg.sender];
+
+        uint left = mulExp(collaterals, ETHPrice) - borrowed;
+        uint toRemove = mulExp(amount, ETHPrice);
+
+        require(toRemove < left, "You don't have enough collaterals");
+
         usersCollateral[msg.sender] -= amount;
         totalCollateral -= amount;
-        payable(msg.sender).transfer(amount);
+
+        payable(msg.sender).transfer(amount);        
+    }
+
+    function borrowDai(uint amount) external {
+        require(usersCollateral[msg.sender] > 0, "You don't have any collaterals");
+
+        uint borrowed    = usersBorrowed[msg.sender];
+        uint collaterals = usersCollateral[msg.sender];
 
     }
-    function borrowDai( uint256 amount) external onlyUser{
-        require ( usersCollateral[msg.sender] > 0,"you do not have any collaterals");
-        uint256 barrowed = usersBorrowed[msg.sender];
-        uint256 collateral = usersCollateral[msg.sender];
-        uint256 left = mulExp(collateral, uint256(getLatestPrice())) - barrowed;
-        uint256 borrowLimit = percentage(left, maxLTV);
-        require ( borrowLimit >= amount , "you cannot pass the limit");
-        dai.transferFrom(address(this) ,msg.sender, amount);
-        totalBorrowed += amount;baseRate;
 
-    }
-    function repay( uint256 amount) external onlyUser{
-        require (usersBorrowed[msg.sender] > 0 , "you do not have any dept");
-        uint256 ratio = getExp(totalBorrowed, totalDeposit);
-        uint256 interestMul = getExp(borrowRate - baseRate , ratio);
-        uint256 rate = mulExp(ratio , interestMul) + baseRate;
-        uint256 fee = amount * rate;
-        uint256 paid = amount - fee;
+    function repay(uint amount) external {
+        require(usersBorrowed[msg.sender] > 0, "You don't have any dep");
+        uint ratio = getExp(totalBorrowed , totalDeposit);
+        uint interestMul = getExp(borrowRate - baseRate, ratio);
+        uint rate = (ratio * interestMul) +baseRate;
+        uint fee = amount * rate;
+        uint paid = amount - fee;
+
         totalReserve += fee;
         usersBorrowed[msg.sender] -= paid;
-        totalBorrowed -= paid;
-    }
-    function triggerLiquidation( address user ) external onlyOwner
-    {
-        uint256 barrowed = usersBorrowed[user];
-        uint256 collateral = usersCollateral[user];
-        uint256 left = mulExp(collateral, ethPrice) - barrowed;
-
-
-        percentage(left, maxLTV);
-
-    }
-    function harvest() external onlyOwner{
-        
-    }
-    function convert() external onlyOwner{
-       
+        totalBorrowed -= paid; 
     }
 
+    function liquidation() external onlyOwner() {
+
+
+    }
+
+
+
+    function getCash() public view returns (uint256) {
+        return totalDeposit - totalBorrowed;
+    }
 
     function getExchangeRate() public view returns (uint256) {
         if (totalSupply() == 0) {
             return 1000000000000000000;
         }
-        uint256 cash = totalDeposit - (totalBorrowed);
-        uint256 num = cash + (totalBorrowed) + (totalReserve);
+        uint256 cash = getCash();
+        uint256 num = cash + totalBorrowed + totalReserve;
         return getExp(num, totalSupply());
     }
-      function getLatestPrice() public view returns (int256) {
+    function getLatestPrice() public view returns (int256) {
         (, int256 price, , , ) = priceFeed.latestRoundData();
         return price * 10**10;
     }
